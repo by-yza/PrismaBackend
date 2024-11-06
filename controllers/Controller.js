@@ -83,7 +83,31 @@ module.exports = {
                 },
             })
             const produtos = await prisma.produto.findMany();
-            res.status(200).json(produtos);
+            produtos.sort((a,b)=>{
+                return b.ValorTotal-a.ValorTotal
+            })
+            res.status(200).json(produtos[0]);
+        }catch(error){
+            res.status(500).json({ error: "Erro ao listar proprietário por nome"})
+        }
+    },
+    async proprietarioMaiorQuantidade(req,res){
+        try {
+            const proprietarios = await prisma.proprietario.findMany({
+                include:{
+                    _count:{
+                        select:{
+                            produtos:true
+                        }
+                    }
+                },
+                orderBy:{
+                    produtos:{
+                        _count:"desc"
+                    }
+                }
+            });
+            res.status(200).json(proprietarios[0]);
         }catch(error){
             res.status(500).json({ error: "Erro ao listar proprietário por nome"})
         }
