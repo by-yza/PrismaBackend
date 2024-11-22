@@ -2,6 +2,28 @@ const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient();
 
 module.exports = {
+    async criarProprietario(req, res) {
+        try {
+          const { id, nome, email, endereco } = req.body;
+          const novoProprietario = await prisma.proprietario.create({
+            data: { id, nome, email, endereco }
+          });
+          res.status(201).json(novoProprietario);
+        } catch (error) {
+          res.status(500).json({ error: 'Erro ao cadastrar proprietário' });
+        }
+    },
+    async criarProduto(req, res) {
+        try {
+          const { id, descricao, quantidade, valor, proprietarioId } = req.body;
+          const novoProduto = await prisma.produto.create({
+            data: { id, descricao, quantidade, valor, proprietarioId }
+          });
+          res.status(201).json(novoProduto);
+        } catch (error) {
+          res.status(500).json({ error: 'Erro ao cadastrar produto' });
+        }
+    },
     async listarProprietarios(req,res){
         try {
             const proprietarios = await prisma.proprietario.findMany();
@@ -53,7 +75,7 @@ module.exports = {
             });
             res.status(200).json(produtos[0]);
         }catch(error){
-            res.status(500).json({ error: "Erro ao listar proprietário por nome"})
+            res.status(500).json({ error: "Erro ao listar produto de maior quantidade"})
         }
     },
     async produtoMaiorValor(req,res){
@@ -65,7 +87,7 @@ module.exports = {
             });
             res.status(200).json(produtos[0]);
         }catch(error){
-            res.status(500).json({ error: "Erro ao listar proprietário por nome"})
+            res.status(500).json({ error: "Erro ao listar produto de maior valor"})
         }
     },
     async produtoMaiorValorTotal(req,res){
@@ -88,7 +110,7 @@ module.exports = {
             })
             res.status(200).json(produtos[0]);
         }catch(error){
-            res.status(500).json({ error: "Erro ao listar proprietário por nome"})
+            res.status(500).json({ error: "Erro ao listar produto de maior valor total"})
         }
     },
     async proprietarioMaiorQuantidade(req,res){
@@ -109,7 +131,69 @@ module.exports = {
             });
             res.status(200).json(proprietarios[0]);
         }catch(error){
-            res.status(500).json({ error: "Erro ao listar proprietário por nome"})
+            res.status(500).json({ error: "Erro ao listar proprietário com maior quantidade de produtos"})
+        }
+    },
+    async atualizarProprietario(req, res) {
+        try {
+            const { id } = req.params;
+            const {  nome, email, endereco} = req.body;
+      
+            const proprietario = await prisma.proprietario.update({
+              where: { id: Number(id) },
+              data: {  nome, email, endereco}
+            });
+      
+            res.status(200).json(proprietario);
+        } catch (error) {
+            res.status(500).json({ error: 'Erro ao atualizar proprietário' });
+        }
+    },
+    async atualizarProduto(req, res) {
+        try {
+            const { id } = req.params;
+            const { descricao, quantidade, valor, proprietarioId } = req.body;
+      
+            const produto = await prisma.produto.update({
+              where: { id: Number(id) },
+              data: { descricao, quantidade, valor, proprietarioId }
+            });
+      
+            res.status(200).json(produto);
+        } catch (error) {
+            res.status(500).json({ error: 'Erro ao atualizar proprietário' });
+        }
+    },
+    async deletarProprietario(req,res){
+        try {
+            const {id} = req.params;
+            const deletarProp = await prisma.proprietario.delete({
+                where: {
+                  id: Number(id),
+                },
+              })
+                
+            
+            res.status(200).json({ message: "Proprietário deletado com sucesso" })
+
+        }catch(error){
+            res.status(500).json({ error: "Erro ao deletar proprietário" });
+        }
+    },
+    async deletarProduto(req,res){
+        try {
+            const {id} = req.params;
+            const deletarProd = await prisma.produto.delete({
+                where: {
+                  id: Number(id),
+                },
+              })
+                
+            
+            res.status(200).json({ message: "Produto deletado com sucesso" })
+
+        }catch(error){
+            res.status(500).json({ error: "Erro ao deletar produto" });
         }
     }
 }
