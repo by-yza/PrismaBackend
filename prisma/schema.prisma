@@ -26,6 +26,6 @@ model Produto{
   descricao String
   quantidade Int
   valor Float
-  proprietario Proprietario @relation(fields: [proprietarioId], references: [id])
+  proprietario Proprietario @relation(fields: [proprietarioId], references: [id], onDelete: Cascade)
   proprietarioId Int
 }
